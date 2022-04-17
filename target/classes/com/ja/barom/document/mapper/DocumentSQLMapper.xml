@@ -1,0 +1,889 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ja.barom.document.mapper.DocumentSQLMapper">
+
+	<select id="createCasePk" resultType="string">
+		SELECT 'S' || TO_CHAR(SYSDATE,'yymmdd') || Barom_case_seq.nextval FROM Dual
+	</select>
+
+	<select id="createBasicInfoPk" resultType="int">
+		SELECT Barom_CaseBasicInfo_seq.nextval FROM Dual
+	</select>
+	
+	<select id="createPlaintiffPk" resultType="int">
+		SELECT Barom_Plaintiff_seq.nextval FROM Dual
+	</select>
+	
+	<select id="createDefendantPk" resultType="int">
+		SELECT Barom_Defendant_seq.nextval FROM Dual
+	</select>
+	
+	<select id="createAttorneyRelatedPk" resultType="int">
+		SELECT BR_attorney_realted_seq.nextval FROM Dual
+	</select>
+	
+	<select id="createAttorneyPk" resultType="int">
+		SELECT Barom_attorney_seq.nextval FROM Dual
+	</select>
+	
+	<select id="createPurposePk" resultType="int">
+		SELECT Barom_Purpose_seq.nextval FROM Dual
+	</select>
+	
+	<select id="createCausePk" resultType="int">
+		SELECT Barom_Cause_seq.nextval FROM Dual
+	</select>
+	
+	<select id="createDefensePk" resultType="int">
+		Select Barom_Defense_seq.nextval FROM Dual
+	</select>
+	
+	<insert id="insertCase">
+		INSERT INTO Barom_case VALUES(
+			#{case_no}
+			,#{user_no}
+			,#{status_no}
+			,#{approval_no}
+			,SYSDATE
+			,#{case_refuse_reason}
+		)
+	</insert>
+	
+	<insert id="insertCaseBasicInfo">
+		INSERT INTO Barom_CaseBasicInfo VALUES (
+			#{caseBasicInfo_no}
+			,#{case_no}
+			,#{min_sj_sgn_category_no}
+			,#{min_sj_court_category_no}
+			,#{caseBasicInfo_claim_method}
+			,#{caseBasicInfo_price_method}
+			,#{caseBasicInfo_price}
+		)
+	</insert>
+	
+	<insert id="insertPlaintiff">
+		INSERT INTO Barom_Plaintiff VALUES (
+			#{plaintiff_no}
+			,#{case_no}
+			,#{plaintiff_personal}
+			,#{plaintiff_selected}
+			,#{plaintiff_resident_num}
+			,#{plaintiff_name}
+			,#{plaintiff_zipcode}
+			,#{plaintiff_address}
+			,#{plaintiff_send_address}
+			,#{plaintiff_nationality}
+			,#{plaintiff_phone}
+			,#{plaintiff_email}
+		)
+	</insert>
+	
+	<insert id="insertDefendant">
+		INSERT INTO Barom_Defendant VALUES (
+			#{defendant_no}
+			,#{case_no}
+			,#{defendant_personal}
+			,#{defendant_resident_num}
+			,#{defendant_name}
+			,#{defendant_zipcode}
+			,#{defendant_address}
+			,#{defendant_send_address}
+			,#{defendant_nationality}
+			,#{defendant_phone}
+			,#{defendant_email}
+		)
+	</insert>
+	
+	<insert id="insertAttorneyRelated">
+		INSERT INTO BR_attorney_realted VALUES (
+			#{attorney_related_no}
+			,#{concerned_no}
+			,#{attorney_no}
+			,#{attorney_related_for}
+		)
+	</insert>
+	
+	<insert id="insertAttorney">
+		INSERT INTO Barom_attorney VALUES (
+			#{attorney_no}
+			,#{attorney_personal}
+			,#{attorney_resident_num}
+			,#{attorney_name}
+			,#{attorney_zipcode}
+			,#{attorney_address}
+			,#{attorney_send_address}
+			,#{attorney_phone}
+			,#{attorney_email}
+		)
+	</insert>
+	
+	<insert id="insertPurpose">
+		INSERT INTO Barom_Purpose VALUES (
+			#{purpose_no}
+			,#{case_no}
+			,#{purpose_content}
+			,#{purpose_attach}
+		)
+	</insert>
+	
+	<insert id="insertCause">
+		INSERT INTO Barom_Cause VALUES (
+			#{cause_no}
+			,#{case_no}
+			,#{cause_content}
+			,#{cause_attach}
+		)
+	</insert>
+	
+	<insert id="insertDocumentConfirmed">
+		INSERT INTO Barom_DocumentConfirmed VALUES (
+			Barom_DocumentConfirmed_seq.nextval
+			,#{case_no}
+			,#{confirmed_url}
+			,'0'
+		)
+	</insert>
+	
+	<insert id="insertProofFile">
+		INSERT INTO Barom_ProofFile VALUES (
+			Barom_ProofFile_seq.nextval
+			,#{case_no}
+			,#{file_name}
+			,#{file_original_name}
+			,#{file_extension}
+			,SYSDATE
+		)
+	</insert>
+	
+	<insert id="insertDocumentPayInfo">
+		INSERT INTO Barom_DocumentPay VALUES (
+			Barom_DocumentPay_seq.nextval
+			,#{case_no}
+			,#{pay_name}
+			,#{pay_user_id}
+			,#{pay_method}
+			,#{pay_price}
+			,NULL
+			,NULL
+		)
+	</insert>
+	
+	<select id="getCaseByNo" resultType="com.ja.barom.Vo.CaseVo">
+		SELECT *
+		FROM Barom_case
+		WHERE case_no = #{no}
+	</select>
+	
+	<select id="isThisUsersCase" resultType="int">
+		SELECT count(*)
+		FROM Barom_Case
+		WHERE user_no = #{user_no}
+		AND case_no = #{case_no}
+	</select>
+
+	<select id="getCaseBasicInfoByNo" resultType="com.ja.barom.Vo.CaseBasicInfoVo">
+		SELECT * 
+		FROM Barom_CaseBasicInfo
+		WHERE caseBasicInfo_no = #{no}
+	</select>
+	
+	<select id="getCaseBasicInfoByCaseNo" resultType="com.ja.barom.Vo.CaseBasicInfoVo">
+		SELECT *
+		FROM Barom_CaseBasicInfo
+		WHERE case_no = #{no}
+	</select>
+	
+	<select id="getPlaintiffByNo" resultType="com.ja.barom.Vo.PlaintiffVo">
+		SELECT *
+		FROM Barom_Plaintiff
+		WHERE plaintiff_no = #{no} 
+	</select>
+	
+	<select id="getPlaintiffByCaseNo" resultType="com.ja.barom.Vo.PlaintiffVo">
+	    SELECT *
+		FROM Barom_Plaintiff
+		WHERE case_no = #{no}
+	</select>
+	
+	<select id="getPlaintiffListByCaseNo" resultType="com.ja.barom.Vo.PlaintiffVo">
+		SELECT *
+		FROM Barom_Plaintiff
+		WHERE case_no = #{no}
+	</select>
+	
+	<select id="getPlaintiffNameCountByCaseNo" resultType="int">
+		SELECT count(*) FROM Barom_Plaintiff_Name WHERE plaintiff_no = #{no}
+	</select>
+	
+	<select id="getDefendantByNo" resultType="com.ja.barom.Vo.DefendantVo">
+		SELECT *
+		FROM Barom_Defendant
+		WHERE defendant_no = #{no}
+	</select>
+	
+	<select id="getDefendantByCaseNo" resultType="com.ja.barom.Vo.DefendantVo">
+		SELECT *
+		FROM Barom_Defendant
+		WHERE case_no = #{no}
+	</select>
+	
+	<select id="getDefendantListByCaesNo" resultType="com.ja.barom.Vo.DefendantVo">
+		SELECT *
+		FROM Barom_Defendant
+		WHERE case_no = #{no}
+	</select>
+	
+	<select id="getDefendantNameCountByCaseNo" resultType="int">
+		SELECT count(*) FROM Barom_Defendant_Name WHERE defendant_no = #{no}
+	</select>
+	
+	<select id="getAttorneyRelatedByAttorneyNo" resultType="com.ja.barom.Vo.AttorneyRelatedVo">
+		SELECT *
+		FROM BR_attorney_realted
+		WHERE attorney_related_no = #{no}
+	</select>
+	
+	<select id="getAttorneyRelatedByConcernedPlaintiffNo" resultType="com.ja.barom.Vo.AttorneyRelatedVo">
+		SELECT *
+		FROM BR_attorney_related
+		WHERE concerned_no = #{no}
+		AND attorney_related_for = 'P'
+	</select>
+	
+	<select id="getAttorneyRelatedByConcernedDefendantNo" resultType="com.ja.barom.Vo.AttorneyRelatedVo">
+		SELECT *
+		FROM BR_attorney_related
+		WHERE concerned_no = #{no}
+		AND attorney_related_for = 'D'
+	</select>
+	
+	<select id="getAttorneyByNo" resultType="com.ja.barom.Vo.AttorneyVo">
+		SELECT *
+		FROM Barom_attorney
+		WHERE attorney_no = #{no}
+	</select>
+	
+	<select id="getPurposeByNo" resultType="com.ja.barom.Vo.PurposeVo">
+		SELECT * 
+		FROM Barom_Purpose
+		WHERE purpose_no = #{no}
+	</select>
+	
+	<select id="getPurposeByCaseNo" resultType="com.ja.barom.Vo.PurposeVo">
+		SELECT *
+		FROM Barom_Purpose
+		WHERE case_no = #{no}
+	</select>
+	
+	<select id="getCauseByNo" resultType="com.ja.barom.Vo.CauseVo">
+		SELECT *
+		FROM Barom_Cause
+		WHERE cause_no = #{no}
+	</select>
+	
+	<select id="getCauseByCaseNo" resultType="com.ja.barom.Vo.CauseVo">
+		SELECT *
+		FROM Barom_Cause
+		WHERE case_no = #{no}
+	</select>
+	
+	<select id="getDocumentConfirmedByNo" resultType="com.ja.barom.Vo.DocumentConfirmedVo">
+		SELECT *
+		FROM Barom_DocumentConfirmed
+		WHERE confirmed_no = #{no}
+	</select>
+	
+	<select id="getDocumentConfirmedByCaseNo" resultType="com.ja.barom.Vo.DocumentConfirmedVo">
+		SELECT *
+		FROM Barom_DocumentConfirmed
+		WHERE case_no = #{no}
+	</select>
+	
+	<select id="getProofFileByNo" resultType="com.ja.barom.Vo.ProofFileVo">
+		SELECT *
+		FROM Barom_ProofFile
+		WHERE file_no = #{no}
+	</select>
+	
+	<select id="getProofFileByCaseNo" resultType="com.ja.barom.Vo.ProofFileVo">
+		SELECT *
+		FROM Barom_ProofFile
+		WHERE case_no = #{no}
+	</select>
+	
+	<select id="getProofFileList" resultType="com.ja.barom.Vo.ProofFileVo">
+		SELECT *
+		FROM Barom_ProofFile
+		WHERE case_no = #{no}
+	</select>
+	
+	<select id="getSgnCateoryNameByNo" resultType="com.ja.barom.Vo.Min_Sj_Sgn_CategoryVo">
+		SELECT *
+		FROM BR_Min_Sj_Sgn_Category
+		WHERE min_sj_sgn_category_no = #{no}
+	</select>
+	
+	<select id="getCourtCategoryNameByNo" resultType="com.ja.barom.Vo.Min_Sj_Court_CategoryVo">
+	    SELECT *
+		FROM BR_Min_Sj_Court_Category
+		WHERE min_sj_court_category_no = #{no}
+	</select>
+	
+	<select id="getSgnCategoryList" resultType="com.ja.barom.Vo.Min_Sj_Sgn_CategoryVo">
+		SELECT *
+		FROM BR_Min_Sj_Sgn_Category
+		ORDER BY min_sj_sgn_category_no ASC
+	</select>
+	
+	<select id="getCourtCategoryList" resultType="com.ja.barom.Vo.Min_Sj_Court_CategoryVo">
+		SELECT *
+		FROM BR_Min_Sj_Court_Category
+		ORDER BY min_sj_court_category_no
+	</select>
+	
+	<select id="getCaseForPdfByNo" resultType="com.ja.barom.Vo.DocumentPDFVo">
+		SELECT
+		cas.case_no,
+		cas.CASE_SAVE_DATE,
+		msc.MIN_SJ_SGN_CATEGORY_NAME,
+		mcc.MIN_SJ_COURT_CATEGORY_NAME,
+		pup.PURPOSE_CONTENT,
+		bc.CAUSE_CONTENT
+		FROM 
+		Barom_case cas, 
+		Barom_CaseBasicInfo cbi, 
+		BR_Min_Sj_Sgn_Category msc,
+		BR_MIN_SJ_COURT_CATEGORY mcc, 
+		Barom_Purpose pup,
+		BAROM_CAUSE bc
+		WHERE cas.case_no = cbi.case_no
+		AND cas.case_no = cbi.case_no
+		AND cas.case_no = pup.case_no
+		AND cas.CASE_NO = bc.CASE_NO 
+		AND cbi.MIN_SJ_COURT_CATEGORY_NO = mcc.MIN_SJ_COURT_CATEGORY_NO 
+		AND cbi.MIN_SJ_SGN_CATEGORY_NO = msc.MIN_SJ_SGN_CATEGORY_NO 
+		AND cas.case_no = #{no}
+	</select>
+	
+	<select id="getPrePdfByNo" resultType="String">
+		SELECT confirmed_url FROM Barom_DocumentConfirmed WHERE case_no = #{no}
+	</select>
+	
+	<delete id="deletePrePdfByUrl">
+		DELETE FROM Barom_DocumentConfirmed 
+		WHERE confirmed_url = #{url} 
+	</delete>
+	
+	<update id="updatePrePdfByUrl">
+		UPDATE Barom_DocumentConfirmed SET confirmed_status = 1 WHERE confirmed_url = #{url}
+	</update>
+	
+	<update id="updateCaseStatusAfterPdf">
+		UPDATE Barom_case SET status_no = 3 WHERE CASE_no = #{caseNo}
+	</update>
+	
+	<select id="getMyCaseList" resultType="map">
+		SELECT t2.*, dc.confirmed_url FROM 
+		(SELECT t1.case_no, t1.case_save_date, t1.approval_no, ssc.MIN_SJ_SGN_CATEGORY_NAME, scc.MIN_SJ_COURT_CATEGORY_NAME, ss.STATUS_NAME, bas.approval_name
+			FROM BR_Min_Sj_Sgn_Category ssc, BR_Min_Sj_Court_Category scc, Barom_submit_status ss, Barom_approval_status bas,
+				(SELECT t0.*, cbi.MIN_SJ_SGN_CATEGORY_NO, cbi.MIN_SJ_COURT_CATEGORY_NO  FROM Barom_CaseBasicInfo cbi, 
+					(SELECT * FROM Barom_case WHERE user_no = #{userNo} ORDER BY case_save_date DESC) t0
+				WHERE t0.case_no = cbi.CASE_NO) t1
+			WHERE t1.min_sj_court_category_no = ssc.MIN_SJ_SGN_CATEGORY_NO 
+			AND t1.min_sj_sgn_category_no = scc.MIN_SJ_COURT_CATEGORY_NO
+			AND t1.status_no = ss.STATUS_NO
+			AND t1.approval_no = bas.approval_no
+			<if test=' courtOption != 0 '>
+				AND t1.min_sj_sgn_category_no = #{courtOption}
+			</if>
+			<if test=' minDate != "" &amp;&amp; maxDate != "" '>
+				AND t1.case_save_date BETWEEN #{minDate} AND #{maxDate}
+			</if>
+			<if test=' caseNo != "" '>
+				AND t1.case_no = #{caseNo}
+			</if>
+			<if test=' docOption != 0 '>
+				<choose>
+					<when test=' docOption == 2 '>
+						AND t1.approval_no IN (1, 4)
+					</when>
+					<when test=' docOption == 3 '>
+						AND t1.approval_no IN (2, 3)
+					</when>
+				</choose>
+			</if>) t2
+		LEFT OUTER JOIN Barom_DocumentConfirmed dc ON t2.case_no = dc.CASE_NO 
+	</select>
+	
+	<select id="getCaseRefuseReason" resultType="String">
+		SELECT case_refuse_reason FROM Barom_case WHERE CASE_NO = #{caseNo}
+	</select>
+
+	<select id="getIsPayInfoExists" resultType="int">
+		SELECT count(*)
+		FROM Barom_DocumentPay
+		WHERE case_no = #{no}
+	</select>
+	
+	<update id="updateCaseStatusAfterPay">
+		UPDATE Barom_case SET status_no = 2, approval_no = 1 WHERE CASE_no = #{caseNo}
+	</update>
+
+	<delete id="delCaseBasicInfo">
+		DELETE FROM Barom_CaseBasicInfo
+		WHERE caseBasicInfo_no = #{no}
+	</delete>
+	
+	<delete id="delPlaintiff">
+		DELETE FROM Barom_Plaintiff
+		WHERE plaintiff_no = #{no}
+	</delete>
+	
+	<delete id="delDefendant">
+		DELETE FROM Barom_Defendant
+		WHERE defendant_no = #{no} 
+	</delete>
+	
+	<delete id="delAttorneyRelated">
+		DELETE FROM BR_attorney_realted
+		WHERE attorney_related_no = #{no}
+	</delete>
+	
+	<delete id="delAttorneyRelatedByAttorneyNo">
+		DELETE FROM BR_attorney_related
+		WHERE attorney_no = #{no}
+	</delete>
+	
+	<delete id="delAttorney">
+		DELETE FROM Barom_attorney
+		WHERE attorney_no = #{no}
+	</delete>
+	
+	<delete id="delPurpose">
+		DELETE FROM Barom_Defendant
+		WHERE purpose_no = #{no}
+	</delete>
+
+	<delete id="delCause">
+		DELETE FROM Barom_Cause
+		WHERE cause_no = #{no}
+	</delete>
+	
+	<delete id="delDocumentConfirmed">
+		DELETE FROM Barom_DocumentConfirmed
+		WHERE confirmed_no = #{no}
+	</delete>
+	
+	<delete id="delProofFile">
+		DELETE FROM Barom_ProofFile
+		WHERE file_no = #{no}
+	</delete>
+	
+	<delete id="delProofFIleByName">
+		DELETE FROM Barom_ProofFile
+		WHERE file_name = #{name}
+	</delete>
+	
+	<update id="updateCaseBasicInfo">
+		UPDATE Barom_CaseBasicInfo
+		SET case_no = #{case_no}
+			,min_sj_sgn_category_no = #{min_sj_sgn_category_no}
+			,min_sj_court_category_no = #{min_sj_court_category_no}
+			,caseBasicInfo_claim_method = #{caseBasicInfo_claim_method}
+			,caseBasicInfo_price_method = #{caseBasicInfo_price_method}
+			,caseBasicInfo_price = #{caseBasicInfo_price}
+		WHERE caseBasicInfo_no = #{caseBasicInfo_no}
+	</update>
+	
+	<update id="updatePlaintiff">
+		UPDATE Barom_Plaintiff
+		SET plaintiff_personal = #{plaintiff_personal}
+			,plaintiff_resident_num = #{plaintiff_resident_num}
+			,plaintiff_name = #{plaintiff_name}
+			,plaintiff_address = #{plaintiff_address}
+			,plaintiff_send_address = #{plaintiff_send_address}
+			,plaintiff_nationality = #{plaintiff_nationality}
+			,plaintiff_phone = #{plaintiff_phone}
+			,plaintiff_email = #{plaintiff_email}
+		WHERE plaintiff_no = #{plaintiff_no}
+	</update>
+	
+	<update id="updateDefendant">
+		UPDATE Barom_Defendant
+		SET defendant_personal = #{defendant_personal}
+			,defendant_resident_num = #{defendant_resident_num}
+			,defendant_name = #{defendant_name}
+			,defendant_address = #{defendant_address}
+			,defendant_send_address = #{defendant_send_address}
+			,defendant_nationality = #{defendant_nationality}
+			,defendant_phone = #{defendant_phone}
+			,defendant_email = #{defendant_email}
+		WHERE defendant_no = #{defendant_no}
+	</update>
+	
+	<update id="updateAttorneyRelated">
+		UPDATE BR_attorney_realted
+		SET concerned_no = #{concerned_no}
+			,attorney_no = #{attorney_no}
+			,attorney_related_for = #{attorney_related_for}
+	</update>
+	
+	<update id="updateAttorney">
+		UPDATE Barom_attorney
+		SET attorney_personal = #{attorney_personal}
+			,attorney_resident_num = #{attorney_resident_num}
+			,attorney_name = #{attorney_name}
+			,attorney_zipcode = #{attorney_zipcode}
+			,attorney_address = #{attorney_address}
+			,attorney_send_address = #{attorney_send_address}
+			,attorney_nationality = #{attorney_nationality}
+			,attorney_phone = #{attorney_phone}
+			,attorney_email = #{attorney_email}
+	</update>
+	
+	<update id="updatePurpose">
+		UPDATE Barom_Purpose
+		SET purpose_content = #{purpose_content}
+			,purpose_attach = #{purpose_attach}
+		WHERE purpose_no = #{purpose_no}
+	</update>
+	
+	<update id="updateCause">
+		UPDATE Barom_Cause
+		SET cause_content = #{cause_content}
+			,cause_attach = #{cause_attach}
+		WHERE cause_no = #{cause_no}
+	</update>
+	 
+	<update id="updateProofFile"></update>
+	
+	<update id="updateDocumentPayInfo">
+		UPDATE Barom_DocumentPay 
+		SET pay_name = #{pay_name}
+			,pay_user_id = #{pay_user_id}
+			,pay_method = #{pay_method}
+			,pay_price = #{pay_price}
+	</update>
+	
+	<update id="updateDocumentPayDateAndToken">
+		UPDATE Barom_DocumentPay
+		SET pg_token = #{pg_token}
+			,pay_date = SYSDATE
+		WHERE case_no = #{case_no}
+	</update>
+	
+	<insert id="insertDefendantCase">
+		INSERT INTO Barom_defendant_case VALUES (
+			Barom_defendant_case_seq.nextval,
+			#{caseConfirmedNo},
+			#{userNo}
+		)
+	</insert>
+	
+	<select id="getCaseConfirmedCount" parameterType="hashmap" resultType="int">
+		SELECT 
+			COUNT(*)
+		FROM BAROM_DEFENDANT bd, Barom_Plaintiff bp,
+			(SELECT co.Case_Confirmed_no, co.case_no, co.case_confirmed_date, ca.MIN_SJ_COURT_CATEGORY_NAME, sc.MIN_SJ_SGN_CATEGORY_NAME 
+			FROM Barom_Case_Confirmed co, BR_Min_Sj_Court_Category ca, BR_Min_Sj_Sgn_Category sc
+			WHERE Case_Confirmed_no = #{caseConfirmedNo}
+			AND co.min_sj_court_category_no = ca.min_sj_court_category_no
+			AND co.min_sj_sgn_category_no = sc.min_sj_sgn_category_no) t1 
+		WHERE t1.case_no = bd.CASE_NO
+		AND t1.case_no = bp.CASE_NO
+		AND bd.DEFENDANT_NAME = #{defendantName}
+		AND bd.DEFENDANT_ZIPCODE = #{defendantZipcode}
+		AND bd.DEFENDANT_ADDRESS = #{defendantAddress}
+	</select>
+	
+	<select id="getCaseConfirmed" resultType="map">
+		SELECT co.Case_Confirmed_no, co.case_no, co.case_confirmed_date, ca.MIN_SJ_COURT_CATEGORY_NAME, sc.MIN_SJ_SGN_CATEGORY_NAME 
+		FROM Barom_Case_Confirmed co, BR_Min_Sj_Court_Category ca, BR_Min_Sj_Sgn_Category sc
+		WHERE co.min_sj_court_category_no = ca.min_sj_court_category_no
+		AND co.min_sj_sgn_category_no = sc.min_sj_sgn_category_no
+		AND co.case_confirmed_no = #{confirmedNo}
+	</select>
+	
+	<select id="getCaseConfirmedList" resultType="hashmap">
+		SELECT t1.* FROM 
+		(SELECT co.Case_Confirmed_no, co.case_no, co.case_confirmed_date, ca.MIN_SJ_COURT_CATEGORY_NAME, sc.MIN_SJ_SGN_CATEGORY_NAME 
+			FROM Barom_Case_Confirmed co, BR_Min_Sj_Court_Category ca, BR_Min_Sj_Sgn_Category sc, Barom_defendant_case dc
+			WHERE co.Case_Confirmed_no = dc.Case_Confirmed_no
+			AND co.min_sj_court_category_no = ca.min_sj_court_category_no
+			AND co.min_sj_sgn_category_no = sc.min_sj_sgn_category_no
+			AND dc.user_no = #{userNo}
+			ORDER BY case_confirmed_date desc) t1 
+		<if test="searchOption != 0">
+			<choose>
+				<when test="searchOption == 1">
+					INNER JOIN Barom_Defense bd ON t1.Case_Confirmed_no = bd.CASE_CONFIRMED_NO
+				</when>
+				<when test="searchOption == 2">
+					LEFT JOIN Barom_Defense bd ON t1.Case_Confirmed_no = bd.CASE_CONFIRMED_NO WHERE bd.CASE_CONFIRMED_NO IS NULL
+				</when>
+			</choose>
+		</if>
+	</select>
+	
+	<select id="getConfirmedListForPlaintiff" resultType="map">
+		
+	SELECT t8.*, td.TRIAL_DOCUMENT_URL FROM
+		( SELECT t7.*, bt.TRIAL_NO  FROM 
+			( SELECT t6.*, dd.DOCUMENT_URL FROM 
+				( SELECT t5.*, bdc.DEFENSE_NO FROM 
+					( SELECT t4.*, CASECONFIRMED_STATUS_NAME FROM BR_Case_confirmed_Status cs,
+						( SELECT t3.*, bcc.CASE_CONFIRMED_NO, bcc.CASE_CONFIRMED_DATE, bcc.CASECONFIRMED_STATUS_NO FROM Barom_Case_Confirmed bcc,
+							( SELECT t2.CASE_NO, t2.CONFIRMED_URL, sc.MIN_SJ_SGN_CATEGORY_NAME , ca.MIN_SJ_COURT_CATEGORY_NAME  
+								FROM BR_Min_Sj_Sgn_Category sc, BR_Min_Sj_Court_Category ca,
+									( SELECT t1.*, cb.MIN_SJ_SGN_CATEGORY_NO, cb.MIN_SJ_COURT_CATEGORY_NO  FROM Barom_CaseBasicInfo cb,
+										( SELECT bc.CASE_NO, dc.CONFIRMED_URL 
+										FROM Barom_case bc,  Barom_DocumentConfirmed dc
+										WHERE bc.USER_NO = #{userNo}
+										AND bc.CASE_NO = dc.CASE_NO ORDER BY bc.case_save_date desc) t1
+									WHERE t1.CASE_NO = cb.CASE_NO ) t2
+								WHERE t2. MIN_SJ_SGN_CATEGORY_NO = sc.MIN_SJ_SGN_CATEGORY_NO 
+							AND t2.MIN_SJ_COURT_CATEGORY_NO = ca.MIN_SJ_COURT_CATEGORY_NO 
+							<if test="courtOption != 0">
+								AND t2.MIN_SJ_COURT_CATEGORY_NO = #{courtOption}
+							</if>) t3
+						WHERE t3.CASE_NO = bcc.CASE_NO 
+						<if test=' minDate != "" &amp;&amp; maxDate != "" '>
+							AND bcc.case_confirmed_date BETWEEN #{minDate} AND #{maxDate}
+						</if>
+						<if test=' confirmedNo != "" '>
+							AND bcc.Case_Confirmed_no = #{confirmedNo}
+						</if>) t4
+					WHERE t4.CASECONFIRMED_STATUS_NO = cs.CASECONFIRMED_STATUS_NO 
+					<if test="statusOption != 0">
+						AND t4.CASECONFIRMED_STATUS_NO = #{statusOption}
+					</if>) t5
+				LEFT OUTER JOIN Barom_Defense bdc ON t5.Case_Confirmed_no = bdc.Case_Confirmed_no
+				<if test="answerOption != 0">
+					<choose>
+						<when test="answerOption == 1">
+							WHERE t5.Case_Confirmed_no = bdc.Case_Confirmed_no
+						</when>
+						<when test="answerOption == 2">
+							WHERE bdc.DEFENSE_NO IS NULL
+						</when>
+					</choose>
+				</if>) t6
+				LEFT OUTER JOIN Barom_Defense_Document dd ON t6.DEFENSE_NO = dd.DEFENSE_NO ) t7
+			LEFT OUTER JOIN Barom_trial bt ON t7.Case_Confirmed_no = bt.Case_Confirmed_no ) t8
+		LEFT OUTER JOIN Barom_trial_document td ON t8.trial_no = td.TRIAL_NO
+	</select>
+	
+	<select id="getConfirmedListForDeffendant" resultType="map">
+		SELECT t8.*, td.TRIAL_DOCUMENT_URL FROM 
+			( SELECT t7.*, bt.TRIAL_NO  FROM 
+			 	( SELECT t6.*, dd.DOCUMENT_URL FROM 
+					( SELECT t5.*, bdc.DEFENSE_NO FROM 
+						( SELECT t4.*, dc.CONFIRMED_URL FROM Barom_DocumentConfirmed dc,
+							( SELECT t3.*, sc.MIN_SJ_SGN_CATEGORY_NAME , ca.MIN_SJ_COURT_CATEGORY_NAME FROM BR_Min_Sj_Sgn_Category sc, BR_Min_Sj_Court_Category ca,
+								( SELECT t2.*, cs.CASECONFIRMED_STATUS_NAME FROM BR_Case_confirmed_Status cs,
+									( SELECT t1.*, cc.CASE_CONFIRMED_DATE, cc.MIN_SJ_SGN_CATEGORY_NO, cc.MIN_SJ_COURT_CATEGORY_NO, cc.CASE_NO, cc.CASECONFIRMED_STATUS_NO
+									FROM Barom_Case_Confirmed cc,
+										( SELECT CASE_CONFIRMED_NO FROM Barom_defendant_case WHERE USER_NO = #{userNo} ) t1
+									WHERE t1.CASE_CONFIRMED_NO = cc.CASE_CONFIRMED_NO 
+									<if test=' minDate != "" &amp;&amp; maxDate != "" '>
+										AND cc.case_save_date BETWEEN #{minDate} AND #{maxDate}
+									</if>
+									<if test=' confirmedNo != "" '>
+										AND cc.case_no = #{confirmedNo}
+									</if> ORDER BY cc.CASE_CONFIRMED_DATE DESC) t2
+								WHERE t2.CASECONFIRMED_STATUS_NO = cs.CASECONFIRMED_STATUS_NO 
+								<if test="statusOption != 0">
+									AND t2.CASECONFIRMED_STATUS_NO = #{statusOption}
+								</if>) t3
+							WHERE t3. MIN_SJ_SGN_CATEGORY_NO = sc.MIN_SJ_SGN_CATEGORY_NO 
+							AND t3.MIN_SJ_COURT_CATEGORY_NO = ca.MIN_SJ_COURT_CATEGORY_NO 
+							<if test="courtOption != 0">
+								AND t3.MIN_SJ_COURT_CATEGORY_NO = #{courtOption}
+							</if>) t4
+						WHERE t4.CASE_NO = dc.CASE_NO ) t5
+					LEFT OUTER JOIN Barom_Defense bdc ON t5.Case_Confirmed_no = bdc.Case_Confirmed_no 
+					<if test="answerOption != 0">
+						<choose>
+							<when test="answerOption == 1">
+								WHERE t5.Case_Confirmed_no = bdc.Case_Confirmed_no
+							</when>
+							<when test="answerOption == 2">
+								WHERE bdc.DEFENSE_NO IS NULL
+							</when>
+						</choose>
+					</if>) t6
+				LEFT OUTER JOIN Barom_Defense_Document dd ON t6.DEFENSE_NO = dd.DEFENSE_NO ) t7
+			LEFT OUTER JOIN Barom_trial bt ON t7.Case_Confirmed_no = bt.Case_Confirmed_no ) t8
+		LEFT OUTER JOIN Barom_trial_document td ON t8.trial_no = td.TRIAL_NO
+	</select>
+	
+	<select id="getConfirmedListForPlaintiffSub" parameterType="hashmap" resultType="map">
+		SELECT t2.* FROM Barom_case bc,
+			(SELECT t1.*, cs.CASECONFIRMED_STATUS_NAME FROM BR_Case_confirmed_Status cs,
+				(SELECT cc.CASE_CONFIRMED_NO, cc.CASE_NO, cc.CASE_CONFIRMED_DATE,cc.CASECONFIRMED_STATUS_NO, sc.MIN_SJ_SGN_CATEGORY_NAME, ca.MIN_SJ_COURT_CATEGORY_NAME
+				FROM Barom_Case_Confirmed cc, BR_Min_Sj_Sgn_Category sc, BR_Min_Sj_Court_Category ca 
+				WHERE cc.MIN_SJ_SGN_CATEGORY_NO = sc.MIN_SJ_SGN_CATEGORY_NO 
+				AND cc.MIN_SJ_COURT_CATEGORY_NO = ca.MIN_SJ_COURT_CATEGORY_NO
+				<if test=' minDate != "" &amp;&amp; maxDate != "" '>
+					AND cc.case_save_date BETWEEN #{minDate} AND #{maxDate}
+				</if>
+				<if test=' confirmedNo != "" '>
+					AND cc.case_no = #{confirmedNo}
+				</if>
+				<if test="courtOption != 0">
+					AND cc.MIN_SJ_COURT_CATEGORY_NO = #{courtOption}
+				</if>
+				ORDER BY cc.case_confirmed_date DESC) t1 
+			WHERE t1.CASECONFIRMED_STATUS_NO = cs.CASECONFIRMED_STATUS_NO
+			<if test="statusOption != 0">
+				AND t1.CASECONFIRMED_STATUS_NO = #{statusOption}
+			</if>) t2 
+		WHERE t2.case_no = bc.CASE_NO AND bc.USER_NO = #{userNo}
+	</select>
+	
+	<select id="getConfirmedListForDefendantffSub" parameterType="hashmap" resultType="map">
+		SELECT t6.*, dd.DOCUMENT_URL FROM 
+			( SELECT t5.*, bdc.DEFENSE_NO FROM 
+				( SELECT t4.*, dc.CONFIRMED_URL FROM Barom_DocumentConfirmed dc,
+					( SELECT t3.*, sc.MIN_SJ_SGN_CATEGORY_NAME , ca.MIN_SJ_COURT_CATEGORY_NAME FROM BR_Min_Sj_Sgn_Category sc, BR_Min_Sj_Court_Category ca,
+						( SELECT t2.*, cs.CASECONFIRMED_STATUS_NAME FROM BR_Case_confirmed_Status cs,
+							( SELECT t1.*, cc.CASE_CONFIRMED_DATE, cc.MIN_SJ_SGN_CATEGORY_NO, cc.MIN_SJ_COURT_CATEGORY_NO, cc.CASE_NO, cc.CASECONFIRMED_STATUS_NO
+							FROM Barom_Case_Confirmed cc,
+								( SELECT CASE_CONFIRMED_NO FROM Barom_defendant_case WHERE USER_NO = #{userNo} ) t1
+							WHERE t1.CASE_CONFIRMED_NO = cc.CASE_CONFIRMED_NO 
+							<if test=' minDate != "" &amp;&amp; maxDate != "" '>
+								AND cc.case_save_date BETWEEN #{minDate} AND #{maxDate}
+							</if>
+							<if test=' confirmedNo != "" '>
+								AND cc.case_no = #{confirmedNo}
+							</if>) t2
+						WHERE t2.CASECONFIRMED_STATUS_NO = cs.CASECONFIRMED_STATUS_NO 
+						<if test="statusOption != 0">
+							AND t2.CASECONFIRMED_STATUS_NO = #{statusOption}
+						</if>) t3
+					WHERE t3. MIN_SJ_SGN_CATEGORY_NO = sc.MIN_SJ_SGN_CATEGORY_NO 
+					AND t3.MIN_SJ_COURT_CATEGORY_NO = ca.MIN_SJ_COURT_CATEGORY_NO 
+					<if test="courtOption != 0">
+						AND t3.MIN_SJ_COURT_CATEGORY_NO = #{courtOption}
+					</if>) t4
+				WHERE t4.CASE_NO = dc.CASE_NO ) t5
+			LEFT OUTER JOIN Barom_Defense bdc ON t5.Case_Confirmed_no = bdc.Case_Confirmed_no 
+			<if test="answerOption != 0">
+				<choose>
+					<when test="answerOption == 1">
+						WHERE t5.Case_Confirmed_no = bdc.Case_Confirmed_no
+					</when>
+					<when test="answerOption == 2">
+						WHERE WHERE bdc.DEFENSE_NO IS NULL
+					</when>
+				</choose>
+			</if>) t6
+		LEFT OUTER JOIN Barom_Defense_Document dd ON t6.DEFENSE_NO = dd.DEFENSE_NO
+	</select>
+	
+	<select id="getDefendantCaseCount" resultType="int">
+		SELECT COUNT(*) FROM Barom_defendant_case WHERE user_no = #{user_no} AND case_confirmed_no = #{case_confirmed_no}
+	</select>
+	
+	<select id="getPlaintiffCountByConfirmedNo" resultType="int">
+		SELECT count(*) FROM BAROM_PLAINTIFF WHERE case_no = (SELECT case_no FROM Barom_Case_Confirmed WHERE Case_Confirmed_no = #{Case_Confirmed_no})
+	</select>
+	
+	<select id="getDefendantCountByConfirmedNo" resultType="int">
+		SELECT count(*) FROM Barom_Defendant WHERE case_no = (SELECT case_no FROM Barom_Case_Confirmed WHERE Case_Confirmed_no = #{Case_Confirmed_no})
+	</select>
+	
+	<select id="getPlaintiffOneByConfirmedNo" resultType="String">
+		SELECT PLAINTIFF_NAME FROM BAROM_PLAINTIFF 
+		WHERE case_no = (SELECT case_no FROM Barom_Case_Confirmed WHERE Case_Confirmed_no = #{Case_Confirmed_no})
+		AND rownum = 1
+	</select>
+	
+	<select id="getDefendanOneByConfirmedNo" resultType="String">
+		SELECT Defendant_NAME FROM Barom_Defendant 
+		WHERE case_no = (SELECT case_no FROM Barom_Case_Confirmed WHERE Case_Confirmed_no = #{Case_Confirmed_no})
+		AND rownum = 1
+	</select>
+	
+	<update id="updateConfirmedStatusAfterAnswer">
+		UPDATE Barom_Case_Confirmed SET caseconfirmed_status_no = 4 WHERE Case_Confirmed_no = #{confirmedNo}
+	</update>
+	
+	<update id="updateConfirmedStatusAfterJudgment">
+		UPDATE Barom_Case_Confirmed SET caseconfirmed_status_no = 5 WHERE Case_Confirmed_no = #{confirmedNo}
+	</update>
+	
+	<update id="updateConfirmedStatusAfter">
+		UPDATE Barom_Case_Confirmed 
+		SET	caseconfirmed_status_no = #{statusNo}
+		WHERE Case_Confirmed_no = #{confirmedNo}
+	</update>
+	
+	<select id="getWriteAnswerList" resultType="String">
+		SELECT Case_Confirmed_no FROM Barom_defendant_case dc
+		WHERE Case_Confirmed_no NOT IN (SELECT Case_Confirmed_no FROM BAROM_DEFENSE) AND USER_NO = #{userNo}
+	</select>
+	
+	<select id="getCourtByDefenseNo" resultType="String">
+		SELECT min_sj_court_category_name FROM BR_Min_Sj_Court_Category 
+		WHERE MIN_SJ_COURT_CATEGORY_NO = (SELECT min_sj_court_category_no FROM Barom_Case_Confirmed 
+		WHERE Case_Confirmed_no = (SELECT Case_Confirmed_no FROM Barom_Defense WHERE Defense_no = #{defenseNo}))
+	</select>
+	
+	<select id="getDefenseByNo" resultType="com.ja.barom.Vo.DefenseVo">
+		SELECT * FROM Barom_Defense WHERE Defense_no = #{defenseNo}
+	</select>
+	
+	<select id="getDefenseProofListByNo" resultType="com.ja.barom.Vo.DefenseProofFileVo">
+		SELECT * FROM Barom_Defense_ProofFile WHERE Defense_no = #{defenseNo}
+	</select>	
+		
+	<insert id="insertAnswer">
+		INSERT INTO Barom_Defense VALUES (
+			#{defense_no},
+			#{case_confirmed_no},
+			#{user_no},
+			#{cause_answer_content},
+			#{purpose_answer_content},
+			SYSDATE
+		)
+	</insert>
+	
+	<insert id="insertDefenseDocument">
+		INSERT INTO Barom_Defense_Document VALUES (
+			Barom_Defense_Document_seq.nextval,
+			#{Defense_no},
+			#{document_url}
+		)
+	</insert>
+	
+	<insert id="insertDefenseProofFile">
+		INSERT INTO Barom_Defense_ProofFile VALUES (
+			Barom_Defense_ProofFile_seq.nextval,
+			#{Defense_no},
+			#{file_name},
+			#{file_original_name},
+			#{file_extension},
+			SYSDATE 
+		)
+	</insert>
+	
+	<select id="getConfirmedList" resultType="String">
+		SELECT cc.CASE_CONFIRMED_NO FROM Barom_Case_Confirmed cc, 
+		(SELECT CASE_NO FROM Barom_case WHERE user_no = #{userNo}) t1
+		WHERE t1.case_no = cc.CASE_NO
+		AND NOT cc.caseconfirmed_status_no IN (1, 5)
+	</select>
+	
+	<select id="checkAnswerRegist" resultType="int">
+		SELECT count(*) FROM Barom_Defense WHERE Case_Confirmed_no = #{confirmedNo} AND user_no = #{userNo}
+	</select>
+	
+	
+	
+	
+	
+	
+</mapper>

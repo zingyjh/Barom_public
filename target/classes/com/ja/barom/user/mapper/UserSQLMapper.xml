@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ja.barom.user.mapper.UserSQLMapper">
+
+	<select id="getUserInfoByUserNo" resultType="map">
+		SELECT * FROM  Barom_user bu , Barom_findQuestion bf WHERE user_no = #{user_no}
+		AND bu.findquestion_no = bf.findquestion_no
+	</select>
+	
+	<select id="getJoinQuestionList" resultType="com.ja.barom.Vo.QuestionVo">
+		SELECT * FROM Barom_findQuestion
+	</select>
+	
+	<select id="getUserByIdAndPw" resultType="com.ja.barom.Vo.UserVo">
+		SELECT * FROM Barom_user WHERE user_id = #{user_id} AND user_pw = #{user_pw}
+	</select>
+	
+	<select id="getUserIdByUserNo" resultType="string">
+		SELECT user_id
+		FROM Barom_user
+		WHERE user_no = #{no}
+	</select>
+	
+	<select id="getUserIdByNameAndJumin2" resultType="map">
+		SELECT user_id FROM Barom_user WHERE user_name = #{user_name} AND user_jumin2 = #{user_jumin2}
+	</select>
+	
+	<select id="getUserPwByIdAndJumin2" resultType="map">
+		SELECT user_pw FROM Barom_user WHERE user_id = #{user_id} AND user_jumin2 = #{user_jumin2}
+	</select>
+	
+	<select id="checkUser" resultType="int">
+      SELECT count(*) FROM Barom_user WHERE user_id = #{user_id}
+      AND user_name = #{user_name}
+      AND user_jumin2 = #{user_jumin2}                        
+   </select>
+	
+	<select id="checkId" resultType="int">
+		SELECT count(*) FROM Barom_user WHERE user_id = #{user_id}
+	</select>
+
+	<select id="getUserQuestionById" resultType="map">
+		SELECT bf.findQuestion_content FROM Barom_user bs , Barom_findQuestion bf
+		WHERE bs.findQuestion_no = bf.findQuestion_no
+		AND bs.user_id = #{user_id}
+	</select>
+	
+	<select id="getUserPwByfindAnswer" resultType="com.ja.barom.Vo.UserVo">
+     SELECT * FROM Barom_user
+   	WHERE user_findAnswer = #{user_findAnswer} AND user_id = #{user_id}
+   </select>
+	
+	<update id="getUserUpdatePw">
+	UPDATE Barom_user
+    SET user_pw = #{user_pw}
+    WHERE user_findAnswer = #{user_findAnswer} AND user_id = #{user_id}
+	</update>
+	
+	<update id="recoveryUserByInfo">
+	  UPDATE Barom_user SET
+	  user_state = 'active'
+	  WHERE user_id = #{user_id}
+	  AND user_name = #{user_name}	 
+	  AND user_jumin2 = #{user_jumin2}
+	</update>
+
+	<update id="updateUserInfoByUserNo">
+		UPDATE Barom_user SET
+		findQuestion_no = #{findQuestion_no},
+		user_pw = #{user_pw},
+		user_name = #{user_name},
+		user_zipcode = #{user_zipcode},
+		user_address = #{user_address},
+		user_send_address = #{user_send_address},
+		user_email = #{user_email},
+		user_phone = #{user_phone},
+		user_findAnswer = #{user_findAnswer}
+		WHERE user_no = #{user_no}
+	</update>
+	
+	<update id="deleteUserInfoByUserNo">
+		UPDATE Barom_user SET
+		user_state = 'Inactive'
+		WHERE user_no = #{user_no}
+		AND user_pw = #{user_pw}
+	</update>
+	
+	<insert id="insertUser">
+		INSERT INTO Barom_user VALUES (
+			Barom_user_sequence.nextval,
+			#{findQuestion_no}, 
+			#{user_id}, 
+			#{user_pw}, 
+			#{user_name}, 
+			#{user_jumin1}, 
+			#{user_jumin2}, 
+			#{user_zipcode},
+			#{user_address},
+			#{user_send_address}, 
+			#{user_phone}, 
+			#{user_email}, 
+			'active', 
+			sysdate, 
+			#{user_findAnswer})
+	</insert>
+
+	<select id="getUserCaseList" resultType="map">
+		SELECT 
+			br_case.casebasicinfo_no
+			,court_category.min_sj_court_category_name 
+		FROM Barom_CaseBasicInfo br_case
+			LEFT JOIN BR_Min_Sj_Court_Category court_category
+			ON br_case.min_sj_court_category_no = court_category.min_sj_court_category_no
+		WHERE user_no = ${user_no}
+	</select>
+	
+	<select id="getUserByNo" resultType="com.ja.barom.Vo.UserVo">
+		SELECT * FROM Barom_user WHERE user_no = #{no}
+	</select>
+	
+	
+	<insert id="testcode">
+		INSERT INTO testTable VALUES (
+			#{title},
+			<if test="id != null">
+				<choose>
+					<when test='id == ""'>
+						'id=""',
+					</when>
+					<otherwise>
+						'123',
+					</otherwise>
+				</choose>
+			</if>
+			<if test=" id == null">
+				'id=null',
+			</if>
+			'test',
+			#{date},
+			1
+		)
+	</insert>
+	
+	<insert id="testcode1" parameterType="hashmap">
+		INSERT INTO testTable VALUES (
+			#{title},
+			<if test="id != null">
+				<choose>
+					<when test='id == ""'>
+						'id=""',
+					</when>
+					<otherwise>
+						'123',
+					</otherwise>
+				</choose>
+			</if>
+			<if test=" id == null">
+				'id=null',
+			</if>
+			'testmap doing',
+			SYSDATE,
+			2
+		)
+	</insert>
+	
+	
+	
+	
+	
+	
+</mapper>

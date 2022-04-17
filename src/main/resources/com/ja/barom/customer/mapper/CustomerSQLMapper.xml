@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ja.barom.customer.mapper.CustomerSQLMapper">
+
+
+	<!-- //// QnA 관련 -->
+
+
+	<insert id="insertQuestion">
+		INSERT INTO BR_Customre_Question VALUES (
+		cus_question_no_seq.nextval,
+		#{user_no},
+		#{cus_question_title},
+		#{cus_question_content},
+		0,
+		#{cus_question_secret},
+		SYSDATE
+		)
+	</insert>
+
+	<insert id="insertReppleContent">
+		INSERT INTO Br_Repple VALUES(
+		Br_Repple_seq.nextval,
+		#{user_no},
+		#{cus_question_no},
+		#{repple_content},
+		SYSDATE
+		)
+	</insert>
+
+	<select id="getQuestionList"
+		resultType="com.ja.barom.Vo.CustomerQuestionVo">
+		SELECT * FROM BR_Customre_Question ORDER BY cus_question_no
+		DESC
+	</select>
+
+
+	<select id="getQuestionByNo"
+		resultType="com.ja.barom.Vo.CustomerQuestionVo">
+		SELECT *
+		FROM BR_Customre_Question
+		WHERE cus_question_no =
+		#{cus_question_no}
+	</select>
+
+	<update id="increaseReadCount">
+		UPDATE BR_Customre_Question SET
+		cus_question_readcount = cus_question_readcount + 1 WHERE
+		cus_question_no=#{question_no}
+	</update>
+
+	<update id="updateQuestion">
+		UPDATE BR_Customre_Question
+		SET cus_question_title =
+		#{cus_question_title} , cus_question_content =
+		#{cus_question_content}
+		WHERE cus_question_no = #{cus_question_no}
+	</update>
+
+	<delete id="deleteQuestion">
+		DELETE FROM BR_Customre_Question WHERE cus_question_no =
+		#{cus_question_no}
+	</delete>
+
+
+	<update id="updateRepple">
+		UPDATE Br_Repple SET repple_content =
+		#{repple_content} WHERE repple_no = #{repple_no}
+	</update>
+
+	<select id="getReppleList" resultType="com.ja.barom.Vo.ReppleVo">
+		SELECT * FROM Br_Repple
+		ORDER BY repple_no DESC
+	</select>
+
+	<select id="getReppleByNo" resultType="com.ja.barom.Vo.ReppleVo">
+		SELECT * FROM Br_Repple
+		WHERE repple_no = #{repple_no}
+	</select>
+
+	<delete id="deleteReppleContent">
+		DELETE FROM Br_Repple WHERE repple_no = #{no}
+	</delete>
+
+	<!-- 좋아요T -->
+
+	<insert id="insertLike">
+		INSERT INTO BR_CUSTOMRE_QUESTION_LIKE VALUES(
+		Br_Like_seq.nextval,
+		#{user_no},
+		#{cus_question_no},
+		SYSDATE
+		)
+	</insert>
+
+
+	<delete id="deleteLike">
+		DELETE FROM BR_CUSTOMRE_QUESTION_LIKE WHERE user_no =
+		#{user_no} AND
+		cus_question_no = #{cus_question_no}
+	</delete>
+
+	<select id="getTotalLikeCount" resultType="int">
+		SELECT COUNT(*) FROM
+		BR_CUSTOMRE_QUESTION_LIKE WHERE cus_question_no = #{cus_question_no}
+	</select>
+
+	<select id="getMyLikeCount" resultType="int">
+		SELECT COUNT(*)
+		FROM
+		BR_CUSTOMRE_QUESTION_LIKE
+		WHERE cus_question_no = #{cus_question_no}
+		AND user_no = #{user_no}
+	</select>
+
+
+	<!-- 댓글 좋아요 T -->
+	<insert id="insertReppleLike">
+		INSERT INTO BR_Repple_like VALUES(
+		BR_Repple_like_seq.nextval,
+		#{user_no},
+		#{repple_no},
+		SYSDATE
+		)
+	</insert>
+
+	<delete id="deleteReppleLike">
+		DELETE
+		FROM BR_Repple_like
+		WHERE repple_no =
+		#{repple_no}
+		AND user_no = #{user_no}
+	</delete>
+
+	<select id="getTotalReppleLikeCount" resultType="int">
+		SELECT COUNT(*)
+		FROM BR_Repple_like WHERE repple_no = #{repple_no}
+	</select>
+	<select id="getMyReppleLIkeCount" resultType="int">
+		SELECT COUNT(*)
+		FROM BR_Repple_like WHERE repple_no = #{repple_no} AND user_no =
+		#{user_no}
+	</select>
+
+	<select id="getReepleLikeByNo"
+		resultType="com.ja.barom.Vo.ReppleLikeVo">
+		SELECT *
+		FROM BR_Repple_like
+		WHERE repple_no = #{repple_no}
+	</select>
+
+	<select id="getReppleLikeList"
+		resultType="com.ja.barom.Vo.ReppleLikeVo">
+		SELECT * FROM BR_Repple_like ORDER BY repple_no DESC
+	</select>
+
+
+	<select id="getReppleCount" resultType="int">
+		SELECT COUNT(*) FROM
+		BR_Repple WHERE cus_question_no = #{CUS_QUESTION_NO}
+	</select>
+
+
+
+	<!-- //// FAQ 관련 -->
+
+	<!-- 카테고리 -->
+	
+	<select id="getFAQ_CategoryList" resultType="com.ja.barom.Vo.FAQ_CategoryVo">
+		SELECT * FROM BR_FAQ_Category ORDER BY faq_category_no ASC
+	</select>
+	
+	<!--  -->
+
+	<select id="getFaq_category_no" resultType="com.ja.barom.Vo.FAQ_CategoryVo">
+		SELECT * FROM BR_FAQ_CATEGORY WHERE faq_category_no = #{no}
+	</select>
+	
+	<!-- 목록 -->
+	<select id="getFaqList" resultType="com.ja.barom.Vo.FaqVo">
+		SELECT * FROM BR_FAQ ORDER BY faq_no DESC
+	</select>
+	
+	
+	<!-- 상세 -->
+	<select id="getFaqByNo" resultType="com.ja.barom.Vo.FaqVo">
+		SELECT * FROM BR_FAQ WHERE faq_no = #{fbn}
+	</select>
+
+	<select id="getMainPageFAQ" resultType="map">
+		SELECT faq2.*
+		FROM (
+			SELECT faq1.*, ROWNUM AS rnum
+			FROM (
+				SELECT faq.faq_no 
+					   ,faq.faq_title
+					   ,category.faq_category_name
+				FROM BR_FAQ faq
+				LEFT JOIN BR_FAQ_CATEGORY category
+				ON faq.faq_category_no = category.faq_category_no
+				ORDER BY faq_no DESC
+			) faq1
+		) faq2
+		<![CDATA[
+		WHERE faq2.rnum <= 4
+		]]>
+	</select>
+	
+	<!-- //// 공지사항 관련 -->
+	
+	
+	<!-- 공지사항 목록을 조회한다 -->
+	<select id="getAnncmList" resultType="com.ja.barom.Vo.AnnouncementVo">
+			SELECT * FROM BR_Announcement ORDER BY anncm_no DESC
+	</select>
+	
+	<!-- 첨부파일 유무를 확인한다 -->
+	<select id="getCountIsExistAnncmFiles" resultType="int">
+		SELECT COUNT(*) 
+		FROM BR_Anncm_Files 
+		WHERE anncm_no = #{anncm_no}
+	</select>
+	
+	<!-- 공지사항 상세 내용(파일, 첨부)을 조회한다 -->
+	<select id="getAnncmByNo" resultType="com.ja.barom.Vo.AnnouncementVo">
+		SELECT * 
+		FROM BR_Announcement 
+		WHERE anncm_no = #{anncm_no}
+	</select>
+	
+	<select id="getAnncmFiles" resultType="com.ja.barom.Vo.AnncmFilesVo">
+		SELECT * 
+		FROM BR_Anncm_Files
+		WHERE anncm_no = #{anncm_no}
+	</select>
+	
+	<!-- 공지사항 조회수를 올린다 -->
+	<update id="increaseAnncmReadCount">
+		UPDATE BR_Announcement 
+		SET anncm_readcount = anncm_readcount + 1
+		WHERE anncm_no = #{anncm_no}
+	</update>
+	
+	<select id="getMainPageAnncm" resultType="map">
+		SELECT annc2.* 
+		FROM (
+			SELECT annc1.*, ROWNUM AS rnum 
+			FROM (
+				SELECT anncm_no
+					   ,anncm_title
+					   ,anncm_writedate
+				FROM BR_ANNOUNCEMENT
+				ORDER BY anncm_no DESC
+			) annc1
+		) annc2
+		<![CDATA[
+		WHERE annc2.rnum <= 4
+		]]>
+	</select>
+
+</mapper>

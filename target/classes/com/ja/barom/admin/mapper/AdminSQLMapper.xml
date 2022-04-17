@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ja.barom.admin.mapper.AdminSQLMapper">
+
+	<select id="createCaseConfrimedPk" resultType="string">
+		SELECT Barom_Case_Confirmed_seq.nextval FROM dual
+	</select>
+	
+
+	<select id="getcaseList" parameterType="hashmap" resultType="map">	
+	 SELECT cas.case_no,
+	         cas.case_save_date,
+	         cas.approval_no,
+	         bas.approval_name,
+	         msc.min_sj_sgn_category_name,
+	         mcc.min_sj_court_category_name,
+	         bdc.confirmed_url
+	  FROM Barom_case cas,
+	       Barom_CaseBasicInfo bci,
+	       BR_Min_Sj_Sgn_Category msc,
+	       BR_Min_Sj_Court_Category mcc,
+	       Barom_approval_status bas,
+	       Barom_DocumentConfirmed bdc
+	  WHERE cas.status_no = 2
+	  AND cas.case_no = bci.case_no
+	  AND cas.case_no = bdc.case_no
+	  AND cas.approval_no = bas.approval_no
+	  AND bci.min_sj_sgn_category_no = msc.min_sj_sgn_category_no
+	  AND bci.min_sj_court_category_no = mcc.min_sj_court_category_no      
+       <if test='docOption != 0 '>
+ 		AND cas.approval_no = #{docOption}
+       </if>
+       <if test="courtOption != 0">
+       	AND bci.min_sj_court_category_no = #{courtOption}
+       </if>
+       <if test='caseNo != "" '>
+       	AND cas.case_no = #{caseNo}
+       </if>
+       <if test=' minDate != "" &amp;&amp; maxDate != "" '>
+			AND cas.case_save_date BETWEEN #{minDate} AND #{maxDate}
+		</if>		
+	   ORDER BY cas.case_save_date DESC	   
+	</select>
+	
+	<insert id="insertCaseConfirmed">
+		INSERT INTO Barom_Case_Confirmed VALUES(
+			#{case_confirmed_no},
+			#{case_no},
+			#{min_sj_sgn_category_no},
+			#{min_sj_court_category_no},
+			#{caseconfirmed_status_no},
+			SYSDATE,
+			#{case_status_reason}
+		)
+	</insert>
+	
+	<update id="updateCaseStatus">
+		UPDATE Barom_case
+
+		SET approval_no = '2'
+		WHERE case_no = #{case_no}
+	</update>
+	
+	<update id="refuseCaseStatus">
+		UPDATE Barom_case
+
+		SET approval_no = '3', case_refuse_reason = #{case_refuse_reason}
+		WHERE case_no = #{case_no}
+	</update>
+
+	<select id="getAdminByIdAndPw" resultType="com.ja.barom.Vo.AdminVo">
+	SELECT * FROM Barom_admin WHERE admin_id = #{admin_id} AND admin_pw = #{admin_pw}
+	</select>
+	
+	<select id="getCaseConfirmedAndAnsweredList" resultType="map">
+	SELECT t6.*, bt.TRIAL_RESULT_STATUS FROM
+		(SELECT t5.CASE_CONFIRMED_NO, t5.case_confirmed_date, t5.caseconfirmed_status_no, t5.MIN_SJ_SGN_CATEGORY_NAME, t5.document_url, t5.CASECONFIRMED_STATUS_NAME, bdc.CONFIRMED_URL FROM Barom_DocumentConfirmed bdc,
+			(SELECT t4.CASE_CONFIRMED_NO, t4.case_confirmed_date, t4.caseconfirmed_status_no, t4.MIN_SJ_SGN_CATEGORY_NAME, t4.document_url, t4.case_no, cs.CASECONFIRMED_STATUS_NAME FROM BR_Case_confirmed_Status cs,
+				(SELECT t3.CASE_CONFIRMED_NO, t3.case_no, t3.caseconfirmed_status_no, t3.case_confirmed_date, t3.MIN_SJ_SGN_CATEGORY_NAME, bdd.document_url FROM Barom_Defense_Document bdd,
+					(SELECT t2.*, bd.DEFENSE_NO FROM 
+						(SELECT t1.CASE_CONFIRMED_NO, t1.caseconfirmed_status_no, t1.case_confirmed_date, t1.case_no, sc.MIN_SJ_SGN_CATEGORY_NAME  FROM BR_Min_Sj_Sgn_Category sc,
+							(SELECT Case_Confirmed_no, min_sj_sgn_category_no, caseconfirmed_status_no, case_confirmed_date, case_no FROM Barom_Case_Confirmed 
+							<!-- WHERE min_sj_court_category_no = #{courtOption}   -->
+							WHERE min_sj_court_category_no != 0
+							<if test="statusOption != 0">
+								AND caseconfirmed_status_no = #{statusOption}
+							</if>
+							<if test=' minDate != "" &amp;&amp; maxDate != "" '>
+								AND case_confirmed_date BETWEEN #{minDate} AND #{maxDate}
+							</if>
+							<if test='confirmedNo != "" '>
+					       		AND Case_Confirmed_no = #{confirmedNo}
+					       </if>
+							ORDER BY case_confirmed_date DESC ) t1
+						WHERE sc.min_sj_sgn_category_no = t1.MIN_SJ_SGN_CATEGORY_NO) t2 LEFT OUTER JOIN Barom_Defense bd 
+					ON bd.CASE_CONFIRMED_NO = t2.CASE_CONFIRMED_NO) t3
+				WHERE bdd.Defense_no(+) = t3.Defense_no) t4
+			WHERE cs.CASECONFIRMED_STATUS_NO = t4.caseconfirmed_status_no) t5
+		WHERE t5.case_no = bdc.CASE_NO) t6 LEFT OUTER JOIN Barom_trial bt ON t6.Case_Confirmed_no = bt.CASE_CONFIRMED_NO 
+		<if test="trialOption != 0">
+			<choose>
+				<when test="trialOption == 1">
+					WHERE bt.TRIAL_RESULT_STATUS IS NULL
+				</when>
+				<when test="trialOption == 2">
+					WHERE bt.TRIAL_RESULT_STATUS = '판결'
+				</when>
+			</choose>
+		</if>
+	</select>
+	
+	<select id="getCaseConfirmedStatusList" resultType="com.ja.barom.Vo.CaseConfirmedStatusVo">
+		SELECT * FROM BR_Case_confirmed_Status 
+	</select>
+	
+	<select id="getCaseConfirmedAgreeList" resultType="String">
+		SELECT Case_Confirmed_no FROM Barom_Case_Confirmed WHERE caseconfirmed_status_no = 2 ORDER BY case_confirmed_date DESC
+	</select>
+	
+	<select id="getCaseConfiremdJudgeList" resultType="String">
+		SELECT t1.Case_Confirmed_no FROM Barom_Defense bd,
+		(SELECT Case_Confirmed_no FROM Barom_Case_Confirmed WHERE caseconfirmed_status_no = 4 ORDER BY case_confirmed_date DESC) t1
+		WHERE bd.CASE_CONFIRMED_NO = t1.Case_Confirmed_no	
+	</select>
+	
+	<select id="createTrialPk" resultType="int">
+		SELECT Barom_trial_seq.nextval FROM dual
+	</select>
+	
+	<insert id="insertTrial">
+		INSERT INTO Barom_trial VALUES (
+			#{trialNo},
+			#{confirmedNo},
+			#{trialDate},
+			#{trialResult},
+			#{trialOrder},
+			#{trialReason},
+			SYSDATE
+		)
+	</insert>
+	
+	<select id="getTrialByNo" resultType="map">
+		SELECT t2.*, sc.MIN_SJ_SGN_CATEGORY_NAME , ca.MIN_SJ_COURT_CATEGORY_NAME FROM BR_Min_Sj_Sgn_Category sc, BR_Min_Sj_Court_Category ca,
+			( SELECT t1.*, cc.MIN_SJ_SGN_CATEGORY_NO, cc.MIN_SJ_COURT_CATEGORY_NO FROM Barom_Case_Confirmed cc,
+				( SELECT * FROM Barom_trial WHERE Case_Confirmed_no = #{confiremdNo} ) t1
+			WHERE cc.CASE_CONFIRMED_NO = t1.CASE_CONFIRMED_NO ) t2
+		WHERE t2. MIN_SJ_SGN_CATEGORY_NO = sc.MIN_SJ_SGN_CATEGORY_NO 
+		AND t2.MIN_SJ_COURT_CATEGORY_NO = ca.MIN_SJ_COURT_CATEGORY_NO
+	</select>
+	
+	<insert id="insertTrialDocument">
+		INSERT INTO Barom_trial_document VALUES (
+			Barom_trial_document_seq.nextval,
+			#{trial_no},
+			#{trial_document_url}
+		)
+	</insert>
+	
+	<select id="getCourtNameByAdminNo" resultType="String">
+		SELECT cc.MIN_SJ_COURT_CATEGORY_NAME FROM BR_Min_Sj_Court_Category cc,
+			( SELECT min_sj_court_category_no FROM Barom_admin WHERE admin_no = #{no} ) t1
+		WHERE t1.min_sj_court_category_no = cc.MIN_SJ_COURT_CATEGORY_NO
+	</select>
+
+</mapper>

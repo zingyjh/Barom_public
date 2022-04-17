@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ja.barom.admin.mapper.SiteAdminSQLMapper">
+
+
+		
+	<!-- //// FAQ 관련  -->
+	
+	<!-- 등록 -->
+	
+	<insert id="insertFaq">
+		INSERT INTO BR_FAQ VALUES(
+			BR_FAQ_seq.nextval,
+			#{admin_no},
+			#{faq_category_no},
+			#{faq_title},
+			#{faq_content},
+			0
+		)
+	</insert>
+	
+	<!-- 카테고리 -->
+	
+	<select id="getFAQ_CategoryList" resultType="com.ja.barom.Vo.FAQ_CategoryVo">
+		SELECT * FROM BR_FAQ_Category ORDER BY faq_category_no ASC
+	</select>
+	
+	<!--  -->
+
+	<select id="getFaq_category_no" resultType="com.ja.barom.Vo.FAQ_CategoryVo">
+		SELECT * FROM BR_FAQ_CATEGORY WHERE faq_category_no = #{no}
+	</select>
+	
+	<!-- 목록 -->
+	<select id="getFaqList" resultType="com.ja.barom.Vo.FaqVo">
+		SELECT * FROM BR_FAQ ORDER BY faq_no DESC
+	</select>
+	
+	
+	<!-- 상세 -->
+	<select id="getFaqByNo" resultType="com.ja.barom.Vo.FaqVo">
+		SELECT * FROM BR_FAQ WHERE faq_no = #{faq_no}
+	</select>
+
+	
+	
+	<!-- //// 공지사항 관련-->
+
+
+	<!-- 공지사항 목록을 조회한다 -->
+	<select id="getAnncmList" resultType="com.ja.barom.Vo.AnnouncementVo">
+			SELECT * FROM BR_Announcement ORDER BY anncm_no DESC
+	</select>
+	
+	<!-- 첨부파일 유무를 확인한다 -->
+	<select id="getCountIsExistAnncmFiles" resultType="int">
+		SELECT COUNT(*) 
+		FROM BR_Anncm_Files 
+		WHERE anncm_no = #{anncm_no}
+	</select>
+	
+	<!-- 공지사항 상세 내용(파일, 첨부)을 조회한다 -->
+	<select id="getAnncmByNo" resultType="com.ja.barom.Vo.AnnouncementVo">
+		SELECT * 
+		FROM BR_Announcement 
+		WHERE anncm_no = #{anncm_no}
+	</select>
+	
+	<select id="getAnncmFiles" resultType="com.ja.barom.Vo.AnncmFilesVo">
+		SELECT * 
+		FROM BR_Anncm_Files
+		WHERE anncm_no = #{anncm_no}
+	</select>
+	
+	<!-- 공지사항 조회수를 올린다 -->
+	<update id="increaseAnncmReadCount">
+		UPDATE BR_Announcement 
+		SET anncm_readcount = anncm_readcount + 1
+		WHERE anncm_no = #{anncm_no}
+	</update>
+	
+	
+	<!-- 공지사항 글 번호를 생성한다 -->
+		<select id="createAnncmNo" resultType="int">
+				SELECT FP_Board_seq.nextval FROM Dual
+		</select>
+
+	
+	<!-- 관리자가 공지사항을 작성한다, 파일을 첨부한다 -->
+	<insert id="insertAnncm">
+		INSERT INTO BR_Announcement VALUES (
+			#{anncm_no},
+			#{admin_no},
+			#{anncm_title},
+			#{anncm_content},
+			SYSDATE,
+			0
+		)
+	</insert>
+	
+	<!-- 관리자가 공지사항을 작성할 때 파일을 첨부한다-->
+	<insert id="insertAnncmFiles">
+		INSERT INTO BR_Anncm_Files VALUES (
+			BR_Anncm_Files_seq.nextval,
+			#{anncm_no},
+			#{anncm_files_url},
+			#{anncm_original_filename	}
+		)
+	</insert>
+	
+	<!-- 관리자가 공지사항 본문, 첨부를 삭제한다-->
+	<delete id="deleteAnncm">
+			DELETE FROM BR_Announcement
+			WHERE anncm_no = #{anncm_no}
+	</delete>
+	
+	<delete id="deleteAnncmFiles">
+			DELETE FROM BR_Anncm_Files
+			WHERE anncm_no = #{anncm_no}
+	</delete>
+	
+	<!-- 관리자가 공지사항 본문, 첨부를 삭제한다-->
+	<update id="updateAnncm">
+			UPDATE BR_Announcement 
+			SET anncm_title = #{anncm_title}, anncm_content = #{anncm_content}
+			WHERE anncm_no = #{anncm_no}
+	</update>
+
+	
+
+
+
+
+</mapper>
